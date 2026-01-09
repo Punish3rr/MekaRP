@@ -707,9 +707,8 @@
                     this.vy = -Math.abs(Math.sin(newAngle) * speed);
                 }
 
-                const speed = this.baseSpeed * this.speedMultiplier;
-                const moveX = this.vx * speed * dt * 60;
-                const moveY = this.vy * speed * dt * 60;
+                const moveX = this.vx * dt * 60;
+                const moveY = this.vy * dt * 60;
 
                 // Substep collision for high speed
                 const steps = Math.max(1, Math.ceil(Math.sqrt(moveX * moveX + moveY * moveY) / 10));
@@ -793,7 +792,7 @@
                     
                     const hitPos = (this.x - (bounds.x + bounds.width / 2)) / (bounds.width / 2);
                     const angle = hitPos * Math.PI / 3;
-                    const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+                    const speed = this.baseSpeed * this.speedMultiplier;
                     
                     this.vx = Math.sin(angle) * speed;
                     this.vy = -Math.abs(Math.cos(angle) * speed);
@@ -1368,14 +1367,16 @@
             if (ballStuck && (gameState === 'playing' || gameState === 'levelComplete')) {
                 if (paddle.stickyActive && paddle.stickyBall) {
                     ballStuck = false;
-                    paddle.stickyBall.vx = Math.random() > 0.5 ? 1 : -1;
-                    paddle.stickyBall.vy = -1;
+                    const launchAngle = (Math.random() * Math.PI) / 2 + Math.PI / 4;
+                    paddle.stickyBall.vx = Math.cos(launchAngle) * paddle.stickyBall.baseSpeed * (Math.random() > 0.5 ? 1 : -1);
+                    paddle.stickyBall.vy = -Math.sin(launchAngle) * paddle.stickyBall.baseSpeed;
                     paddle.stickyBall = null;
                 } else {
                     ballStuck = false;
                     balls.forEach(ball => {
-                        ball.vx = Math.random() > 0.5 ? 1 : -1;
-                        ball.vy = -1;
+                        const launchAngle = (Math.random() * Math.PI) / 2 + Math.PI / 4;
+                        ball.vx = Math.cos(launchAngle) * ball.baseSpeed * (Math.random() > 0.5 ? 1 : -1);
+                        ball.vy = -Math.sin(launchAngle) * ball.baseSpeed;
                     });
                 }
                 document.getElementById('launchPrompt').style.display = 'none';
